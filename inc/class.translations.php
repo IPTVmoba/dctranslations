@@ -489,7 +489,19 @@ class dcTranslation
             $format=$GLOBALS['core']->blog->settings->system->date_format;
         }
         $f = $GLOBALS['core']->tpl->getFilters($attr);
-        return '<?php echo '.sprintf($f,"\$_ctx->posts->getTime(__('".$format."'))").'; ?>';
+
+        $iso8601 = !empty($attr['iso8601']);
+        $rfc822 = !empty($attr['rfc822']);
+        $type = (!empty($attr['creadt']) ? 'creadt' : '');
+        $type = (!empty($attr['upddt']) ? 'upddt' : $type);
+
+        if ($rfc822) {
+            return '<?php echo '.sprintf($f,"\$_ctx->posts->getRFC822Date('".$type."')").'; ?>';
+        } elseif ($iso8601) {
+            return '<?php echo '.sprintf($f,"\$_ctx->posts->getISO8601Date('".$type."')").'; ?>';
+        } else {
+            return '<?php echo '.sprintf($f,"\$_ctx->posts->getDate(__('".$format."'),'".$type."')").'; ?>';
+        }
     }
     public static function TranslatedEntryTime($attr) {
         $format = '';
@@ -498,8 +510,9 @@ class dcTranslation
         } else {
             $format=$GLOBALS['core']->blog->settings->system->time_format;
         }
+        $type = (!empty($attr['upddt']) ? 'upddt' : '');
         $f = $GLOBALS['core']->tpl->getFilters($attr);
-        return '<?php echo '.sprintf($f,"\$_ctx->posts->getTime(__('".$format."'))").'; ?>';
+        return '<?php echo '.sprintf($f,"\$_ctx->posts->getTime(__('".$format."'),'".$type."')").'; ?>';
     }
 
     // Function to reindex all posts with translation //
